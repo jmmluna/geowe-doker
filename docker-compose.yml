@@ -1,0 +1,38 @@
+version: "3"
+# docker-compose build rtcm-client
+services:
+  #http://127.0.0.1/rtcm-client/
+  rtcm-client:
+    build: ./rtcm-client
+    image: rtcm-client-image
+    container_name: rtcm-client-container
+    working_dir: /rtcm-client
+    volumes:
+      - ./rtcm-client/:/rtcm-client
+      - /rtcm-client/node_modules
+    ports:
+      - 80:80
+    depends_on:
+      - rtcm-server
+  rtcm-server:
+    build: ./rtcm-server
+    image: rtcm-server-image
+    container_name: rtcm-server-container
+    command: "node src/index.js"
+    environment:
+      - RTCM_SERVER_PORT=5000
+    ports:
+      - 3000:5000
+    working_dir: /rtcm-server
+    volumes:
+      - ./rtcm-server/:/rtcm-server
+      - /rtcm-server/node_modules
+    restart: always
+  # http://localhost:8080/geowe-1.5.6/App.html
+  tomcat:
+    container_name: geowe-1.5.6
+    image: tomcat:8-jdk8
+    ports:
+      - 8080:8080
+    volumes:
+      - ./geowe-1.5.6/geowe-1.5.6.war:/usr/local/tomcat/webapps/geowe-1.5.6.war
